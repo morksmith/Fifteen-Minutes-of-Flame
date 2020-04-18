@@ -4,9 +4,13 @@ using UnityEngine;
 
 public class Resource : MonoBehaviour
 {
-    public GameObject ItemPrefab;
+    public GameObject[] ItemPrefabs;
     public float Health = 1;
     public float ItemCount = 1;
+    public Color ParticleColour;
+    public bool RequiresAxe;
+    public bool RequiresPick;
+
     void Start()
     {
         
@@ -31,10 +35,11 @@ public class Resource : MonoBehaviour
     }
     public void Death()
     {
-        var spawnCount = Random.Range(1, ItemCount);
+        var spawnCount = Random.Range(Mathf.Ceil(ItemCount / 2), ItemCount);
         for(var i = 0; i < spawnCount; i++)
         {
-            var newItem = Instantiate(ItemPrefab, transform.position + new Vector3(Random.Range(-0.1f, 0.1f), 0.5F + Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f)), transform.rotation);
+            var resourcePick = Random.Range(0, ItemPrefabs.Length);
+            var newItem = Instantiate(ItemPrefabs[resourcePick], transform.position + new Vector3(Random.Range(-0.1f, 0.1f), 0.5F + Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f)), transform.rotation);
         }
         Destroy(gameObject);
     }

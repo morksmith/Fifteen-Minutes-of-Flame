@@ -57,4 +57,16 @@ public class Fire : MonoBehaviour
         
 
     }
+
+    public void OnTriggerEnter(Collider other)
+    {
+        if(other.transform.tag == "Item")
+        {
+            FireHealth += other.transform.GetComponent<Item>().Fuel;
+            FireHealth = Mathf.Clamp(FireHealth, 0, Manager.MaxFireHealth);
+            Manager.FireHealth = FireHealth;
+            Destroy(other.gameObject);
+            
+        }
+    }
 }

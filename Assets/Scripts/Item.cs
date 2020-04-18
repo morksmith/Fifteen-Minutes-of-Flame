@@ -7,6 +7,8 @@ public class Item : MonoBehaviour
     public Transform Player;
     public string ItemName;
     public bool InInventory = false;
+    public int Slot;
+    public float Fuel;
     public Collider BoxCollider;
 
     private Rigidbody rb;
@@ -24,20 +26,10 @@ public class Item : MonoBehaviour
 
     void Update()
     {
-        if (InInventory)
-        {
-            transform.localScale = Vector3.Lerp(transform.localScale, Vector3.zero, Time.deltaTime * 10);
-            transform.position = Vector3.Lerp(transform.position, Player.position + new Vector3(0, 1, 0), Time.deltaTime * 20);
-            BoxCollider.enabled = false;
-            rb.useGravity = false;
-        }
-        else
-        {
-            BoxCollider.enabled = true;
-            rb.useGravity = true;
-
-        }
+        
     }
 
-    
+   
+
+
 }

@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class PlayerControl : MonoBehaviour
 {
+    public GameManager Manager;
+
     [Header("Movement")]
     public Transform PlayerHead;
     public float LookSpeed;
@@ -19,7 +21,17 @@ public class PlayerControl : MonoBehaviour
     public Sprite NormalCursor;
     public Sprite GrabCursor;
     public Sprite HarvestCursor;
+    public Sprite CraftCursor;
+    public Sprite NoItemCursor;
     public Inventory Inventory;
+    public GameObject HitParticles;
+
+    [Header("Item Management")]
+    public bool AxeEquipped;
+    public bool PickEquipped;
+    public bool TorchEquipped;
+    public Animator HandAnimation;
+    public Animator HeadAnimation;
     
 
 
@@ -28,27 +40,41 @@ public class PlayerControl : MonoBehaviour
     private float sideLook;
     private Vector3 moveVector;
     private float yMod;
+    private float index;
 
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        CursorImage.sprite = NormalCursor;
+        
         SetInvert();
         cam = PlayerHead.GetComponent<Camera>();
     }
 
     void Update()
     {
-        moveVector = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
-        transform.Translate(moveVector * MoveSpeed * Time.deltaTime);
+        if (!Manager.Paused)
+        {
+            CursorImage.transform.localPosition = Vector3.zero;
+            moveVector = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
+            //transform.Translate(moveVector * MoveSpeed * Time.deltaTime);
+            transform.position += transform.forward * moveVector.z * MoveSpeed * Time.deltaTime;
+            transform.position += transform.right * moveVector.x * MoveSpeed * Time.deltaTime;
 
-        vertLook += Input.GetAxis("Mouse Y") * LookSpeed * Time.deltaTime * yMod;
-        vertLook = Mathf.Clamp(vertLook, -90, 90);
-        sideLook += Input.GetAxis("Mouse X") * LookSpeed * Time.deltaTime;
+            vertLook += Input.GetAxis("Mouse Y") * LookSpeed * Time.deltaTime * yMod;
+            vertLook = Mathf.Clamp(vertLook, -90, 90);
+            sideLook += Input.GetAxis("Mouse X") * LookSpeed * Time.deltaTime;
 
-        transform.eulerAngles = new Vector3(0, sideLook, 0);
-        PlayerHead.localEulerAngles = new Vector3(vertLook, 0, 0);
+
+            transform.eulerAngles = new Vector3(0, sideLook, 0);
+            PlayerHead.localEulerAngles = new Vector3(vertLook, 0, 0);
+            index += moveVector.magnitude * Time.deltaTime;
+            HeadAnimation.Play("Walk", 0, index);
+
+        }
+        else
+        {
+            CursorImage.transform.position = Input.mousePosition;
+        }
+        
 
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -58,12 +84,59 @@ public class PlayerControl : MonoBehaviour
             {
                 if (hit.transform.tag == "Resource")
                 {
-                    CursorImage.sprite = HarvestCursor;
-                    if (Input.GetMouseButtonDown(0))
+                    if(hit.transform.GetComponent<Resource>().RequiresAxe)
                     {
-                        var hitResource = hit.transform.GetComponent<Resource>();
-                        hitResource.Harvest(Damage);
+                        if (AxeEquipped)
+                        {
+                            CursorImage.sprite = HarvestCursor;
+                            if (Input.GetMouseButtonDown(0))
+                            {
+                                var hitResource = hit.transform.GetComponent<Resource>();
+                                hitResource.Harvest(Damage);
+                                var hitParts = Instantiate(HitParticles, hit.point, transform.rotation);
+                                hitParts.GetComponent<HitParticles>().StartColour = hitResource.ParticleColour;
+
+                            }
+                        }
+                        else
+                        {
+                            CursorImage.sprite = NoItemCursor;
+                        }
+                        
                     }
+                    else if (hit.transform.GetComponent<Resource>().RequiresPick)
+                    {
+                        if (PickEquipped)
+                        {
+                            CursorImage.sprite = HarvestCursor;
+                            if (Input.GetMouseButtonDown(0))
+                            {
+                                var hitResource = hit.transform.GetComponent<Resource>();
+                                hitResource.Harvest(Damage);
+                                var hitParts = Instantiate(HitParticles, hit.point, transform.rotation);
+                                hitParts.GetComponent<HitParticles>().StartColour = hitResource.ParticleColour;
+
+                            }
+                        }
+                        else
+                        {
+                            CursorImage.sprite = NoItemCursor;
+                        }
+
+                    }
+                    else
+                    {
+                        CursorImage.sprite = HarvestCursor;
+                        if (Input.GetMouseButtonDown(0))
+                        {
+                            var hitResource = hit.transform.GetComponent<Resource>();
+                            hitResource.Harvest(Damage);
+                            var hitParts = Instantiate(HitParticles, hit.point, transform.rotation);
+                            hitParts.GetComponent<HitParticles>().StartColour = hitResource.ParticleColour;
+
+                        }
+                    }
+                    
                 }
                 else if (hit.transform.tag == "Item")
                 {
@@ -71,13 +144,14 @@ public class PlayerControl : MonoBehaviour
                     if (Input.GetMouseButtonDown(0))
                     {
                         var hitItem = hit.transform.GetComponent<Item>();
-                        if (!hitItem.InInventory)
-                        {
-                            hitItem.InInventory = true;
-                            Inventory.Items.Add(hit.transform.gameObject);
-                        }
+                        Inventory.Slots[hitItem.Slot].ItemCount ++;
+                        Destroy(hit.transform.gameObject);
                         
                     }
+                }
+                else if(hit.transform.tag == "Craft")
+                {
+                    CursorImage.sprite = CraftCursor;
                 }
                 else
                 {
@@ -103,5 +177,9 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
+    public void AttackAnimation()
+    {
+        HandAnimation.Play("Attack", 0, 0);
+    }
     
 }

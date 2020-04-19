@@ -171,7 +171,7 @@ MonoBehaviour:
   ItemName: Stick
   InInventory: 0
   Slot: 1
-  Fuel: 1
+  Fuel: 2
   BoxCollider: {fileID: 1674551503357395597}
 --- !u!65 &1674551503357395597
 BoxCollider:

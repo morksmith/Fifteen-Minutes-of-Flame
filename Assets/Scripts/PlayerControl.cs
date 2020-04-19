@@ -28,10 +28,12 @@ public class PlayerControl : MonoBehaviour
 
     [Header("Item Management")]
     public bool AxeEquipped;
-    public bool PickEquipped;
     public bool TorchEquipped;
     public Animator HandAnimation;
     public Animator HeadAnimation;
+
+    [Header("Crafting")]
+    public CraftMenu CraftMenu;
     
 
 
@@ -72,11 +74,16 @@ public class PlayerControl : MonoBehaviour
         }
         else
         {
+            HeadAnimation.Play("Walk", 0, 0);
             CursorImage.transform.position = Input.mousePosition;
-        }
-        
 
-        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+           
+        }
+        transform.eulerAngles = new Vector3(0, sideLook, 0);
+        PlayerHead.localEulerAngles = new Vector3(vertLook, 0, 0);
+
+
+        Ray ray = cam.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height/2, 0));
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit))
         {
@@ -104,26 +111,7 @@ public class PlayerControl : MonoBehaviour
                         }
                         
                     }
-                    else if (hit.transform.GetComponent<Resource>().RequiresPick)
-                    {
-                        if (PickEquipped)
-                        {
-                            CursorImage.sprite = HarvestCursor;
-                            if (Input.GetMouseButtonDown(0))
-                            {
-                                var hitResource = hit.transform.GetComponent<Resource>();
-                                hitResource.Harvest(Damage);
-                                var hitParts = Instantiate(HitParticles, hit.point, transform.rotation);
-                                hitParts.GetComponent<HitParticles>().StartColour = hitResource.ParticleColour;
-
-                            }
-                        }
-                        else
-                        {
-                            CursorImage.sprite = NoItemCursor;
-                        }
-
-                    }
+                    
                     else
                     {
                         CursorImage.sprite = HarvestCursor;
@@ -151,7 +139,21 @@ public class PlayerControl : MonoBehaviour
                 }
                 else if(hit.transform.tag == "Craft")
                 {
-                    CursorImage.sprite = CraftCursor;
+                    if (!CraftMenu.Open)
+                    {
+                        CursorImage.sprite = CraftCursor;
+                        if (Input.GetMouseButtonDown(0))
+                        {
+                            CraftMenu.OpenMenu();
+                            Manager.PauseMenu();
+
+                        }
+                    }
+                    else
+                    {
+                        CursorImage.sprite = NormalCursor;
+                    }
+
                 }
                 else
                 {

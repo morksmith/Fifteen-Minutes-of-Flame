@@ -100,7 +100,6 @@ MonoBehaviour:
   - {fileID: 5894752497723489717, guid: ede6f81f5da77f940881e1adcd7f3d13, type: 3}
   - {fileID: 6797231249040617368, guid: 4eec1bd77cafa6948add41d782a7794a, type: 3}
   - {fileID: 5894752497723489717, guid: ede6f81f5da77f940881e1adcd7f3d13, type: 3}
-  - {fileID: 5894752497723489717, guid: ede6f81f5da77f940881e1adcd7f3d13, type: 3}
   Health: 4
   ItemCount: 4
   ParticleColour: {r: 0.3773585, g: 0.15874687, b: 0.097899616, a: 1}
@@ -163,7 +162,7 @@ LODGroup:
   m_AnimateCrossFading: 0
   m_LastLODIsBillboard: 0
   m_LODs:
-  - screenRelativeHeight: 0.19653086
+  - screenRelativeHeight: 0.09927777
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 4599943322173300268}

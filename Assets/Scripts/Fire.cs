@@ -24,6 +24,7 @@ public class Fire : MonoBehaviour
     private ParticleSystem.EmissionModule smokeModule;
     private ParticleSystem.MainModule smokeMain;
     private ParticleSystem.EmissionModule sparkModule;
+    public GameObject FuelParticles;
     
 
 
@@ -40,14 +41,18 @@ public class Fire : MonoBehaviour
 
     void Update()
     {
-        if(Time.time > flickerTimer)
+        if (!Manager.Paused)
         {
-            var rand = Random.Range(-FlickerVariance, FlickerVariance);
-            PointLight.range = (FireHealth + rand) / 10;
-            PointLight.intensity = (FireHealth + rand) / 100;
-            PointLight.transform.position = new Vector3(originalPos.x + rand / 10, originalPos.y + rand / 10, originalPos.z + rand / 10);
-            flickerTimer = Time.time + FlickerTime;
+            if (Time.time > flickerTimer)
+            {
+                var rand = Random.Range(-FlickerVariance, FlickerVariance);
+                PointLight.range = (FireHealth + rand) / 10;
+                PointLight.intensity = (FireHealth + rand) / 100;
+                PointLight.transform.position = new Vector3(originalPos.x + rand / 10, originalPos.y + rand / 10, originalPos.z + rand / 10);
+                flickerTimer = Time.time + FlickerTime;
+            }
         }
+        
         FireHealth = Manager.FireHealth;
         fireModule.rateOverTime = FireHealth / 20;
         fireMain.startSize = FireHealth / 200;
@@ -65,6 +70,7 @@ public class Fire : MonoBehaviour
             FireHealth += other.transform.GetComponent<Item>().Fuel;
             FireHealth = Mathf.Clamp(FireHealth, 0, Manager.MaxFireHealth);
             Manager.FireHealth = FireHealth;
+            Instantiate(FuelParticles, other.transform.position, transform.rotation);
             Destroy(other.gameObject);
             
         }

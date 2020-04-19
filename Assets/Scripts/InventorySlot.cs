@@ -6,7 +6,7 @@ using TMPro;
 
 public class InventorySlot : MonoBehaviour
 {
-    public enum ItemType { Grass, Leaves, Rocks, Sticks, Logs, Axes, Picks, Torch}
+    public enum ItemType { Grass, Leaves, Rocks, Sticks, Logs, Axes, Ropes, Torch}
     public ItemType Type;
     public Inventory Inventory;
     public Image SlotIcon;
@@ -19,8 +19,11 @@ public class InventorySlot : MonoBehaviour
     public int ItemSlot;
     public GameObject ItemPrefab;
     public bool Tool;
+    public bool Torch;
     public PlayerControl Player;
     public GameManager Manager;
+    public float Health;
+    public TextMeshProUGUI HealthText;
 
     // Start is called before the first frame update
     void Start()
@@ -31,6 +34,23 @@ public class InventorySlot : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(Health <= 0)
+        {
+            ItemCount--;
+            Health = 100;
+        }
+        if (Tool)
+        {
+            if (ItemCount > 0)
+            {
+                HealthText.text = Mathf.RoundToInt(Health) + "%";
+            }
+            else
+            {
+                HealthText.text = " ";
+            }
+        }
+        
         CountText.text = ItemCount.ToString();
         if (Inventory.EquippedItem == ItemSlot)
         {
@@ -52,6 +72,10 @@ public class InventorySlot : MonoBehaviour
 
         if (Equipped)
         {
+            if (Torch && ItemCount > 0 && !Manager.Paused)
+            {
+                Health -= 2 * Time.deltaTime;
+            }
             SlotBackground.color = new Color(SlotBackground.color.r, SlotBackground.color.g, SlotBackground.color.b, 1);
             if(ItemCount > 0)
             {
@@ -70,12 +94,17 @@ public class InventorySlot : MonoBehaviour
         }
         if (!Manager.Paused)
         {
-            if (Input.GetMouseButtonDown(0) && Equipped)
+            if (Input.GetMouseButtonDown(0) && Equipped && ItemCount > 0)
             {
                 
                 if (Tool)
                 {
-                    Player.AttackAnimation();
+                    
+                    if(Player.CursorImage.sprite == Player.HarvestCursor)
+                    {
+                        Player.AttackAnimation();
+                        Health -= 2;
+                    }
                 }
                 else
                 {

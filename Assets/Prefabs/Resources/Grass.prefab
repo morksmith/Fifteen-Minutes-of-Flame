@@ -96,7 +96,7 @@ MonoBehaviour:
   ItemPrefabs:
   - {fileID: 621496049567610158, guid: 4085a63adf825e24881a06ef512b3ac1, type: 3}
   Health: 1
-  ItemCount: 2
+  ItemCount: 3
   ParticleColour: {r: 0, g: 0.509434, b: 0.13653615, a: 1}
   RequiresAxe: 0
   RequiresPick: 0

@@ -171,7 +171,7 @@ MonoBehaviour:
   ItemName: Grass Blades
   InInventory: 0
   Slot: 0
-  Fuel: 1
+  Fuel: 2
   BoxCollider: {fileID: 1084246616}
 --- !u!65 &1084246616
 BoxCollider:
